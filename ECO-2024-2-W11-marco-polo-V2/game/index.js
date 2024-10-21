@@ -135,6 +135,15 @@ socket.on("notification", (data) => {
     shoutDisplay.style.display = "block"
   }
 })
+function updatePointsDisplay(players) {
+  const pointsContainer = document.getElementById("points-container")
+  pointsContainer.innerHTML = ""
+  players.forEach(player => {
+    const playerPoints = document.createElement("div")
+    playerPoints.textContent = `${player.nickname}: ${player.points} points`
+    pointsContainer.appendChild(playerPoints)
+  })
+}
 
 socket.on("notifyGameOver", (data) => {
   gameGround.style.display = "none"
