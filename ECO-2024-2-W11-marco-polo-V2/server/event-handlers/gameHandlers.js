@@ -73,30 +73,44 @@ const onSelectPoloHandler = (socket, db, io) => {
     const poloEspecial = db.players.find((user) => user.role === "polo-especial")
 
     let message = ''
+    let winner = null
 
     if (poloSelected.role !== "polo-especial") {
-      // If the selected player is not polo-especial, polo-especial gains points
       if (poloEspecial) {
         poloEspecial.points += 10
         message = `El marco ${myUser.nickname} ha seleccionado a ${poloSelected.nickname}. ${poloEspecial.nickname} (polo especial) ha ganado 10 puntos!`
+
+        if (poloEspecial.points >= 100) {
+          winner = poloEspecial
+        }
       } else {
-        // In case there's no polo-especial, the marco still gains points
         myUser.points += 10
         message = `El marco ${myUser.nickname} ha ganado 10 puntos! ${poloSelected.nickname} ha sido capturado`
+
+        if (myUser.points >= 100) {
+          winner = myUser
+        }
       }
     } else {
-      // If polo-especial is selected, all other players gain points
       db.players.forEach(player => {
         if (player.id !== poloSelected.id) {
           player.points += 10
+          if (player.points >= 100) {
+            winner = player
+          }
         }
       })
       message = `El marco ${myUser.nickname} ha seleccionado al polo especial ${poloSelected.nickname}. ¡Todos los demás jugadores han ganado 10 puntos!`
     }
 
+    if (winner) {
+      message = `¡${winner.nickname} ha ganado el juego con ${winner.points} puntos! 🏆`
+    }
+
     io.emit("notifyGameOver", {
       message: message,
-      updatedPlayers: db.players
+      updatedPlayers: db.players,
+      winner: winner
     })
   }
 }
