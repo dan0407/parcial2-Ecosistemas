@@ -1,27 +1,3 @@
-// import { router, socket } from "../routes.js";
-
-// export default function renderScreen1() {
-//   const app = document.getElementById("app");
-
-//   app.innerHTML = `
-//     <h2>Game Results</h2>
-//     <ul id="scores-list"></ul>
-//   `;
-
-//   socket.on("notifyGameOver", (data) => {
-//     console.log("Received notifyGameOver event:", data);
-//     const scoresList = document.getElementById("scores-list");
-//     scoresList.innerHTML = "";
-
-//     data.updatedPlayers.forEach(player => {
-//       console.log("Player data:", player);
-//         const scoreItem = document.createElement("li");
-//       scoreItem.textContent = `${player.nickname}: ${player.points} points`;
-//       scoresList.appendChild(scoreItem);
-//     });
-//   });
-// }
-
 import { router, socket } from '../routes.js';
 
 export default function renderScreen1() {
@@ -31,17 +7,22 @@ export default function renderScreen1() {
 		<div class="results-container">
 			<h2 class="results-title">Game Results</h2>
 			<div id="winner-announcement"></div>
+			<div class="sort-buttons">
+				<button id="sortAlpha" class="sort-btn">Sort by Name</button>
+				<button id="sortScore" class="sort-btn">Sort by Score</button>
+			</div>
 			<ul id="scores-list" class="scores-list"></ul>
 		</div>
 	`;
 
+	let players = [];
+
 	socket.on('notifyGameOver', (data) => {
 		console.log('Received notifyGameOver event:', data);
-		const scoresList = document.getElementById('scores-list');
+		players = data.updatedPlayers;
 		const winnerAnnouncement = document.getElementById('winner-announcement');
-		scoresList.innerHTML = '';
 
-		const winner = data.updatedPlayers.find((player) => player.points >= 100);
+		const winner = players.find((player) => player.points >= 100);
 		if (winner) {
 			winnerAnnouncement.innerHTML = `
 				<div class="winner-message">
@@ -51,11 +32,27 @@ export default function renderScreen1() {
 			`;
 		}
 
-		data.updatedPlayers.forEach((player) => {
-			console.log('Player data:', player);
-			const scoreItem = document.createElement('li');
-			scoreItem.textContent = `${player.nickname}: ${player.points} points`;
-			scoresList.appendChild(scoreItem);
-		});
+		renderPlayersList(players);
+	});
+
+	document.getElementById('sortAlpha').addEventListener('click', () => {
+		players.sort((a, b) => a.nickname.localeCompare(b.nickname));
+		renderPlayersList(players);
+	});
+
+	document.getElementById('sortScore').addEventListener('click', () => {
+		players.sort((a, b) => b.points - a.points);
+		renderPlayersList(players);
+	});
+}
+
+function renderPlayersList(players) {
+	const scoresList = document.getElementById('scores-list');
+	scoresList.innerHTML = '';
+
+	players.forEach((player) => {
+		const scoreItem = document.createElement('li');
+		scoreItem.textContent = `${player.nickname}: ${player.points} points`;
+		scoresList.appendChild(scoreItem);
 	});
 }

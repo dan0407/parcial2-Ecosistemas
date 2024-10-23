@@ -1,15 +1,5 @@
-// gameHandlers.js
 
 const { assignRoles } = require("../utils/helpers")
-
-// Assuming db and io are required or passed in some way to be accessible
-// const joinGameHandler = (socket, db, io) => {
-//   return (user) => {
-//     db.players.push({ id: socket.id, ...user })
-//     console.log(db.players)
-//     io.emit("userJoined", db) // Broadcasts the message to all connected clients including the sender
-//   }
-// }
 
 const joinGameHandler = (socket, db, io) => {
   return (user) => {
