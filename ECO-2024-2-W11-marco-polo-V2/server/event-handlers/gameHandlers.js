@@ -65,33 +65,21 @@ const onSelectPoloHandler = (socket, db, io) => {
     let message = ''
     let winner = null
 
-    if (poloSelected.role !== "polo-especial") {
-      if (poloEspecial) {
-        poloEspecial.points += 50
-        message = `El marco ${myUser.nickname} ha seleccionado a ${poloSelected.nickname}. ${poloEspecial.nickname} (polo especial) ha ganado 50 puntos!`
-
-        if (poloEspecial.points >= 100) {
-          winner = poloEspecial
-        }
-      } else {
-        myUser.points += 50
-        message = `El marco ${myUser.nickname} ha ganado 50 puntos! ${poloSelected.nickname} ha sido capturado`
-
-        if (myUser.points >= 100) {
-          winner = myUser
-        }
-      }
-    } else {
-      db.players.forEach(player => {
-        if (player.id !== poloSelected.id) {
-          player.points += 50
-          if (player.points >= 100) {
-            winner = player
-          }
-        }
-      })
-      message = `El marco ${myUser.nickname} ha seleccionado al polo especial ${poloSelected.nickname}. ¡Todos los demás jugadores han ganado 50 puntos!`
+    if (poloSelected.role === "polo-especial") {
+      // Marco catches Polo Especial
+      myUser.points += 50 // Marco gains 50 points
+      poloSelected.points -= 10 // Polo Especial loses 10 points
+      message = `El marco ${myUser.nickname} ha atrapado al polo especial ${poloSelected.nickname}. Marco gana 50 puntos, Polo Especial pierde 10 puntos.`
+    } else if (poloSelected.role === "polo") {
+      // Marco fails to catch Polo Especial
+      myUser.points -= 10 // Marco loses 10 points
+      poloEspecial.points += 10 // Polo Especial gains 10 points
+      message = `El marco ${myUser.nickname} no logró atrapar al polo especial. Marco pierde 10 puntos, Polo Especial gana 10 puntos.`
     }
+
+    // Check if anyone has reached 100 points
+    const players = [myUser, poloSelected, poloEspecial];
+    winner = players.find(player => player.points >= 100);
 
     if (winner) {
       message = `¡${winner.nickname} ha ganado el juego con ${winner.points} puntos! 🏆`
