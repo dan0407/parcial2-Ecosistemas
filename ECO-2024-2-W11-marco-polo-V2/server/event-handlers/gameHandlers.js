@@ -67,15 +67,15 @@ const onSelectPoloHandler = (socket, db, io) => {
 
     if (poloSelected.role !== "polo-especial") {
       if (poloEspecial) {
-        poloEspecial.points += 10
-        message = `El marco ${myUser.nickname} ha seleccionado a ${poloSelected.nickname}. ${poloEspecial.nickname} (polo especial) ha ganado 10 puntos!`
+        poloEspecial.points += 50
+        message = `El marco ${myUser.nickname} ha seleccionado a ${poloSelected.nickname}. ${poloEspecial.nickname} (polo especial) ha ganado 50 puntos!`
 
         if (poloEspecial.points >= 100) {
           winner = poloEspecial
         }
       } else {
-        myUser.points += 10
-        message = `El marco ${myUser.nickname} ha ganado 10 puntos! ${poloSelected.nickname} ha sido capturado`
+        myUser.points += 50
+        message = `El marco ${myUser.nickname} ha ganado 50 puntos! ${poloSelected.nickname} ha sido capturado`
 
         if (myUser.points >= 100) {
           winner = myUser
@@ -84,13 +84,13 @@ const onSelectPoloHandler = (socket, db, io) => {
     } else {
       db.players.forEach(player => {
         if (player.id !== poloSelected.id) {
-          player.points += 10
+          player.points += 50
           if (player.points >= 100) {
             winner = player
           }
         }
       })
-      message = `El marco ${myUser.nickname} ha seleccionado al polo especial ${poloSelected.nickname}. ¡Todos los demás jugadores han ganado 10 puntos!`
+      message = `El marco ${myUser.nickname} ha seleccionado al polo especial ${poloSelected.nickname}. ¡Todos los demás jugadores han ganado 50 puntos!`
     }
 
     if (winner) {
